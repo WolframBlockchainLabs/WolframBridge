@@ -1,2 +1,1 @@
-# WolframOracle
-Wolfram Oracle
+#Wolfram Oracle
