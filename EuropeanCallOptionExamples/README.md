@@ -9,3 +9,4 @@ Here is a general description of a smart contract for a European call option. De
  4. Once a buyer has entered the contract the funds can't be withdrawn, they have to wait until the expiration date for the execution of the contract.
  5. If the expiration date has passed and the current price of the asset is less than the strike price then the escrow is returned to the seller and escrow times the strike price is returned to the buyer. In this case the seller profited from the premium.
  6. If the expiration date has passed and the current price of the asset is equal or more than the strike price then the escrow is sent to the buyer and escrow times the strike price is sent to the seller. In this case the buyer purchased the asset for the speculated price.
+![WolframEuropeanCall-FlowChart](https://github.com/WolframBlockchainLabs/WolframOracle/blob/main/EuropeanCallOptionExamples/Images/WolframEuropeanCallOption-FlowDiagram.png)
