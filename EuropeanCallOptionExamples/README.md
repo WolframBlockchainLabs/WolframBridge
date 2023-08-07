@@ -10,3 +10,10 @@ Here is a general description of a smart contract for a European call option. De
  5. If the expiration date has passed and the current price of the asset is less than the strike price then the escrow is returned to the seller and escrow times the strike price is returned to the buyer. In this case the seller profited from the premium.
  6. If the expiration date has passed and the current price of the asset is equal or more than the strike price then the escrow is sent to the buyer and escrow times the strike price is sent to the seller. In this case the buyer purchased the asset for the speculated price.
 ![WolframEuropeanCall-FlowChart](https://github.com/WolframBlockchainLabs/WolframOracle/blob/main/EuropeanCallOptionExamples/Images/WolframEuropeanCallOption-FlowDiagram.png)
+ ## Pricing Data Oracle from Wolfram|Alpha
+The Wolfram|Alpha Full Results API alows developers to get data from the Wolfram|Alpha knowledge base to use in their applications. For this usecase we will get the current price of the asset to evaluate the outcome of the call option. Here is how you can start using the Wolfram|Alpha API
+1. Sign up and get your AppID in the Wolfram|Alpha Developer Portal. You can find the instructions [here](https://products.wolframalpha.com/api/documentation?scrollTo=getting-started).
+2. The parameters of the call are encoded in the URL, for example to call the ETH/USD price here is the call:
+```
+https://api.wolframalpha.com/v2/query?input=ethereum+price+in+usd&output=JSON&includepodid=Result&format=plaintext&appid=AppID
+```
