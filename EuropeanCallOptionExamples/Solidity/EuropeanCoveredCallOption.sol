@@ -20,12 +20,13 @@ contract EuropeanCoveredCallOption is ChainlinkClient, ConfirmedOwner {
     string public ethPrice; 
 
     ERC20 public stableCoin;
-    address payable private buyer;
-    address payable private seller;
+    uint256 public stableDecimals;
+    address payable public buyer; //changed to public
+    address payable public seller; //changed to public
     uint256 public strikePrice;
     uint256 public expirationTime;
-    uint256 public contractPremium;
-    uint256 private escrowAmount = 1000 ether; // 1000 XTZ equivalent in wei - test
+    uint256 public contractPremium = 1000000000000000; //0.001 ETH
+    uint256 private escrowAmount;
     uint256 public currentPrice;
 
     enum ContractState { Waiting, Active, Executed }
@@ -54,26 +55,26 @@ contract EuropeanCoveredCallOption is ChainlinkClient, ConfirmedOwner {
 
     function initContract(
         address _stableCoin,
-        address payable _seller,
         uint256 _strikePrice,
         uint256 _expirationTime,
-        uint256 _contractPremium
+        uint256 _escrowAmount
     ) external payable {
         require(
-            msg.sender.balance >= escrowAmount,
+            msg.sender.balance >= _escrowAmount,
             "Insufficient balance in seller account"
         );
         require(
-            msg.value == escrowAmount,
+            msg.value == _escrowAmount,
             "Please send exact XTZ amount"
         );
         
         // main settings    
         stableCoin = ERC20(_stableCoin);
-        seller = _seller;
+        stableDecimals = stableCoin.decimals();
+        seller = payable(msg.sender); // address that inits the contract is the seller
         strikePrice = _strikePrice;
         expirationTime = _expirationTime;
-        contractPremium = _contractPremium;
+        escrowAmount = _escrowAmount;
         state = ContractState.Waiting;
     }
 
@@ -123,6 +124,11 @@ contract EuropeanCoveredCallOption is ChainlinkClient, ConfirmedOwner {
         req.add("path", "queryresult,pods,0,subpods,0,plaintext");
         // Sends the request
         sendChainlinkRequest(req, fee);  
+    }
+
+    //added this function to run test on remix
+    function dummyRequestData(uint256 _setPrice) public {
+        currentPrice = _setPrice;
     } 
 
     /**
@@ -133,7 +139,7 @@ contract EuropeanCoveredCallOption is ChainlinkClient, ConfirmedOwner {
         ethPrice = string(data);
         ethPrice = getSlice(1, 7, ethPrice);
 
-        currentPrice = strToUint(ethPrice) * 10 ** 14;
+        currentPrice = strToUint(ethPrice) * 10 ** (stableDecimals - 2);
     }
     
     function getSlice(uint256 begin, uint256 end, string memory text) public pure returns (string memory) {
@@ -165,13 +171,20 @@ contract EuropeanCoveredCallOption is ChainlinkClient, ConfirmedOwner {
     function withdrawLink() public onlyOwner { 
         LinkTokenInterface link = LinkTokenInterface(chainlinkTokenAddress()); 
         require(link.transfer(msg.sender, link.balanceOf(address(this))), 'Unable to transfer'); 
+    }
+
+    function sellerWithdraw() public payable { 
+        require(state == ContractState.Waiting, "A seller has entered the contract");
+        require(block.timestamp >= expirationTime, "Contract not at expiration");
+        (bool withdrew,) = seller.call{value: escrowAmount}("");
+        require(withdrew, "Failed to withdraw Ether");
     }     
 
     function enterContract() external payable {
         require(state == ContractState.Waiting, "Invalid state");
         require(msg.value == contractPremium, "Please send exact XTZ amount");
         require(
-            stableCoin.balanceOf(msg.sender) >= strikePrice * 1000,
+            stableCoin.balanceOf(msg.sender) >= (strikePrice * escrowAmount)/10**18,
             "Insufficient stablecoin in buyer account"
         );
 
@@ -180,17 +193,23 @@ contract EuropeanCoveredCallOption is ChainlinkClient, ConfirmedOwner {
 
         (bool sent,) = seller.call{value: contractPremium}(""); //transfer XTZ to contract
         require(sent, "Failed to send ETH");
-        stableCoin.transferFrom(buyer, address(this), strikePrice * 1000); // transfer stablecoin to contract
+        stableCoin.transferFrom(buyer, address(this), (strikePrice * escrowAmount)/10**18); // transfer stablecoin to contract
     }
 
     function executeContract() external {
         require(state == ContractState.Active, "Invalid state");
         require(block.timestamp >= expirationTime, "Contract not at expiration");
-        require(currentPrice >= strikePrice, "Current price is less than strike price");
+        //require(, "Current price is less than strike price");
 
         state = ContractState.Executed;
 
-        stableCoin.transfer(seller, strikePrice * 1000); // transfer stablecoin to seller
-        buyer.transfer(escrowAmount); // transfer XTZ to buyer
+        if (currentPrice >= strikePrice){
+            stableCoin.transfer(seller, (strikePrice * escrowAmount)/10**18)); // transfer stablecoin to seller
+            buyer.transfer(escrowAmount); // transfer XTZ to buyer
+        }
+        else{
+            stableCoin.transfer(buyer, (strikePrice * escrowAmount)/10**18)); // transfer stablecoin to seller
+            seller.transfer(escrowAmount); // transfer XTZ to buyer
+        }
     }
 }
