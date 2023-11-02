@@ -1,0 +1,12 @@
+{
+   "tezosConfig": {
+      "nodeAddress": "https://ghostnet.smartpy.io",
+      "publicKey": "tz1XzzMGjiJWVLAsdsqSNjgu7SuPvVw7JjGM",
+      "privateKey": "edskRseHqSXVRkdWPjziVceoD1XiygQE2WTfrq1vduna76fLBi5HU28m2rJmmP9qqcAPJuPi71XBEsWMW5QWHd7Ho5Hxne6CNF",
+   },
+   "oracleInterval": 30,
+   "eventName": "REQUESTED_PUSHED",
+   "apiKeyID": "aaa",
+   "apiSecret": "aaa",
+   "apiPassphrase": "aaa"
+}

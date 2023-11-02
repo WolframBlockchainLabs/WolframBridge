@@ -1,0 +1,181 @@
+parameter (or (contract %push (big_map string (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat)))))))) (or (pair %pushAsset (string %asset) (string %urlType)) (map %update string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))))));
+storage   (pair (big_map %oracleData string (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) (option %publicKey key));
+code
+  {
+    UNPAIR;     # @parameter : @storage
+    IF_LEFT
+      {
+        # == push ==
+        # sp.transfer(self.data.oracleData, sp.tez(0), params) # @parameter%push : @storage
+        NIL operation; # list operation : @parameter%push : @storage
+        SWAP;       # @parameter%push : list operation : @storage
+        PUSH mutez 0; # mutez : @parameter%push : list operation : @storage
+        DUP 4;      # @storage : mutez : @parameter%push : list operation : @storage
+        CAR;        # big_map string (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat)))))) : mutez : @parameter%push : list operation : @storage
+        TRANSFER_TOKENS; # operation : list operation : @storage
+        CONS;       # list operation : @storage
+      }
+      {
+        IF_LEFT
+          {
+            # == pushAsset ==
+            # sp.verify(self.data.publicKey.is_some(), 'revoked') # @parameter%pushAsset : @storage
+            DUP 2;      # @storage : @parameter%pushAsset : @storage
+            CDR;        # option key : @parameter%pushAsset : @storage
+            IF_NONE
+              {
+                PUSH string "revoked"; # string : @parameter%pushAsset : @storage
+                FAILWITH;   # FAILED
+              }
+              {
+                DROP;       # @parameter%pushAsset : @storage
+              }; # @parameter%pushAsset : @storage
+            SWAP;       # @storage : @parameter%pushAsset
+            # self.data.oracleData[params.asset] = (sp.timestamp(0), (sp.timestamp(0), (0, (0, (0, (0, 0)))))) # @storage : @parameter%pushAsset
+            DUP;        # @storage : @storage : @parameter%pushAsset
+            CAR;        # big_map string (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat)))))) : @storage : @parameter%pushAsset
+            PUSH (option (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) (Some (Pair "1970-01-01T00:00:00Z" (Pair "1970-01-01T00:00:00Z" (Pair 0 (Pair 0 (Pair 0 (Pair 0 0))))))); # option (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat)))))) : big_map string (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat)))))) : @storage : @parameter%pushAsset
+            DUP 4;      # @parameter%pushAsset : option (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat)))))) : big_map string (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat)))))) : @storage : @parameter%pushAsset
+            CAR;        # string : option (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat)))))) : big_map string (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat)))))) : @storage : @parameter%pushAsset
+            UPDATE;     # big_map string (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat)))))) : @storage : @parameter%pushAsset
+            UPDATE 1;   # @storage : @parameter%pushAsset
+            SWAP;       # @parameter%pushAsset : @storage
+            # sp.emit(sp.record(asset = params.asset, event = 'REQUESTED_PUSHED', type = params.urlType), tag = "REQUESTED_PUSHED") # @parameter%pushAsset : @storage
+            NIL operation; # list operation : @parameter%pushAsset : @storage
+            DUP 2;      # @parameter%pushAsset : list operation : @parameter%pushAsset : @storage
+            CDR;        # string : list operation : @parameter%pushAsset : @storage
+            PUSH string "REQUESTED_PUSHED"; # string : string : list operation : @parameter%pushAsset : @storage
+            DIG 3;      # @parameter%pushAsset : string : string : list operation : @storage
+            CAR;        # string : string : string : list operation : @storage
+            PAIR 3;     # pair string (pair string string) : list operation : @storage
+            EMIT %REQUESTED_PUSHED (pair (string %asset) (pair (string %event) (string %type))); # operation : list operation : @storage
+            CONS;       # list operation : @storage
+          }
+          {
+            # == update ==
+            # sp.verify(self.data.publicKey.is_some(), 'revoked') # @parameter%update : @storage
+            DUP 2;      # @storage : @parameter%update : @storage
+            CDR;        # option key : @parameter%update : @storage
+            IF_NONE
+              {
+                PUSH string "revoked"; # string : @parameter%update : @storage
+                FAILWITH;   # FAILED
+              }
+              {
+                DROP;       # @parameter%update : @storage
+              }; # @parameter%update : @storage
+            # for assetData in params.items(): ... # @parameter%update : @storage
+            DUP;        # @parameter%update : @parameter%update : @storage
+            ITER
+              {
+                # compute_oracle_110 = sp.local("compute_oracle_110", sp.fst(assetData.value)) # pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                DUP;        # pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                GET 3;      # signature : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                # compute_oracle_111 = sp.local("compute_oracle_111", sp.snd(assetData.value)) # signature : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                DUP 2;      # pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : signature : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                GET 4;      # pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : signature : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                # if self.data.oracleData.contains(assetData.key): # pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : signature : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                DUP 5;      # @storage : pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : signature : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                CAR;        # big_map string (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat)))))) : pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : signature : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                DUP 4;      # pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : big_map string (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat)))))) : pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : signature : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                CAR;        # string : big_map string (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat)))))) : pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : signature : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                MEM;        # bool : pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : signature : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                IF
+                  {
+                    # compute_oracle_116 = sp.local("compute_oracle_116", self.data.oracleData[assetData.key]) # pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : signature : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                    DUP 5;      # @storage : pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : signature : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                    CAR;        # big_map string (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat)))))) : pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : signature : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                    DUP 4;      # pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : big_map string (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat)))))) : pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : signature : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                    CAR;        # string : big_map string (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat)))))) : pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : signature : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                    GET;        # option (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat)))))) : pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : signature : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                    IF_NONE
+                      {
+                        PUSH int 116; # int : pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : signature : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                        FAILWITH;   # FAILED
+                      }
+                      {}; # @some : pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : signature : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                    # compute_oracle_117 = sp.local("compute_oracle_117", sp.fst(compute_oracle_116.value)) # @some : pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : signature : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                    CAR;        # timestamp : pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : signature : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                    # compute_oracle_118 = sp.local("compute_oracle_118", sp.fst(compute_oracle_111.value)) # timestamp : pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : signature : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                    DUP 2;      # pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : timestamp : pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : signature : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                    CAR;        # timestamp : timestamp : pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : signature : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                    # if compute_oracle_118.value > compute_oracle_117.value: # timestamp : timestamp : pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : signature : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                    COMPARE;    # int : pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : signature : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                    GT;         # bool : pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : signature : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                    IF
+                      {
+                        # sp.verify(sp.check_signature(self.data.publicKey.open_some(), compute_oracle_110.value, sp.pack((assetData.key, compute_oracle_111.value))), 'bad sig') # pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : signature : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                        DUP;        # pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : signature : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                        DUP 4;      # pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : signature : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                        CAR;        # string : pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : signature : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                        PAIR;       # pair string (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat)))))) : pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : signature : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                        PACK;       # bytes : pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : signature : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                        DIG 2;      # signature : bytes : pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                        DUP 6;      # @storage : signature : bytes : pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                        CDR;        # option key : signature : bytes : pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                        IF_NONE
+                          {
+                            PUSH int 124; # int : signature : bytes : pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                            FAILWITH;   # FAILED
+                          }
+                          {}; # @some : signature : bytes : pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                        CHECK_SIGNATURE; # bool : pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                        IF
+                          {}
+                          {
+                            PUSH string "bad sig"; # string : pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                            FAILWITH;   # FAILED
+                          }; # pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                        # self.data.oracleData[assetData.key] = compute_oracle_111.value # pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update : @storage
+                        DIG 3;      # @storage : pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update
+                        DUP;        # @storage : @storage : pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update
+                        CAR;        # big_map string (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat)))))) : @storage : pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update
+                        DIG 2;      # pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))) : big_map string (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat)))))) : @storage : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update
+                        SOME;       # option (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat)))))) : big_map string (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat)))))) : @storage : pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : @parameter%update
+                        DIG 3;      # pair string (pair signature (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))) : option (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat)))))) : big_map string (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat)))))) : @storage : @parameter%update
+                        CAR;        # string : option (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat)))))) : big_map string (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat)))))) : @storage : @parameter%update
+                        UPDATE;     # big_map string (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat)))))) : @storage : @parameter%update
+                        UPDATE 1;   # @storage : @parameter%update
+                        SWAP;       # @parameter%update : @storage
+                      }
+                      {
+                        DROP 3;     # @parameter%update : @storage
+                      }; # @parameter%update : @storage
+                  }
+                  {
+                    DROP 3;     # @parameter%update : @storage
+                  }; # @parameter%update : @storage
+              }; # @parameter%update : @storage
+            DROP;       # @storage
+            NIL operation; # list operation : @storage
+          }; # list operation : @storage
+      }; # list operation : @storage
+    PAIR;       # pair (list operation) @storage
+  };
+view
+  "pull" string (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))
+  {
+    UNPAIR;     # @parameter : @storage
+    # sp.verify(self.data.oracleData.contains(params), 'bad request') # @parameter : @storage
+    DUP 2;      # @storage : @parameter : @storage
+    CAR;        # big_map string (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat)))))) : @parameter : @storage
+    DUP 2;      # @parameter : big_map string (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat)))))) : @parameter : @storage
+    MEM;        # bool : @parameter : @storage
+    IF
+      {}
+      {
+        PUSH string "bad request"; # string : @parameter : @storage
+        FAILWITH;   # FAILED
+      }; # @parameter : @storage
+    SWAP;       # @storage : @parameter
+    # sp.result(self.data.oracleData[params]) # @storage : @parameter
+    CAR;        # big_map string (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat)))))) : @parameter
+    SWAP;       # @parameter : big_map string (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))
+    GET;        # option (pair timestamp (pair timestamp (pair nat (pair nat (pair nat (pair nat nat))))))
+    IF_NONE
+      {
+        PUSH int 158; # int
+        FAILWITH;   # FAILED
+      }
+      {}; # @some
+  };

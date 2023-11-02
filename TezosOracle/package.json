@@ -1,0 +1,28 @@
+{
+  "name": "tezos-oracle",
+  "version": "1.0.0",
+  "description": "A oracle on tezos blockchain",
+  "dependencies": {
+    "@lapo/asn1js": "^1.2.4",
+    "@taquito/signer": "^17.3.2",
+    "@taquito/taquito": "^17.3.2",
+    "@taquito/utils": "^17.3.2",
+    "secp256k1": "^5.0.0"
+  },
+  "scripts": {
+    "clean": "rimraf build tmp",
+    "build": "npm run clean && tsc && cp contracts/oracle.tz ./build/contracts/oracle.tz && cp contracts/normalizer.tz ./build/contracts/normalizer.tz",
+    "lint": "eslint . --ext .ts,.tsx",
+    "start": "node build/src/main.js",
+    "deploy": "node ./build/contracts/deploy.js"
+  },
+  "devDependencies": {
+    "@types/elliptic": "^6.4.16",
+    "@types/request-promise": "^4.1.50",
+    "@types/secp256k1": "^4.0.5",
+    "request-promise": "^4.2.6",
+    "typescript": "^5.2.2",
+    "web-request": "^1.0.7",
+    "winston": "^3.11.0"
+  }
+}
