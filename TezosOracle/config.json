@@ -8,5 +8,6 @@
    "eventName": "REQUESTED_PUSHED",
    "apiKeyID": "aaa",
    "apiSecret": "aaa",
-   "apiPassphrase": "aaa"
+   "apiPassphrase": "aaa",
+   "API_KEY":"aaa"
 }

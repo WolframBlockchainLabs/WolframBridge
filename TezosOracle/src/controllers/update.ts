@@ -444,7 +444,7 @@ async function retrieveOracleDataFromFeed(oracleFeedURL: string): Promise<any> {
  * @param apiPassphrase The passphrase for the Coinbase API key.
  * @return The oracle data.
  */
-async function retrieveOracleDataFromCoinbase(
+export async function retrieveOracleDataFromCoinbase(
   apiKeyID: string,
   apiSecret: string,
   apiPassphrase: string,

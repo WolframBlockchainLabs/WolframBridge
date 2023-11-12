@@ -3,6 +3,7 @@ export {
   updateOracleFromCoinbaseOnce,
   updateOracleFromFeed,
   updateOracleFromFeedOnce,
+  retrieveOracleDataFromCoinbase
 } from './update'
 export { LogLevel } from './common'
 export { default as Utils } from './utils'
