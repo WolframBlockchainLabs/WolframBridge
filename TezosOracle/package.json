@@ -19,6 +19,7 @@
     "build": "npm run clean && tsc && cp contracts/oracle.tz ./build/contracts/oracle.tz && cp contracts/normalizer.tz ./build/contracts/normalizer.tz",
     "lint": "eslint . --ext .ts,.tsx",
     "start": "node build/src/main.js",
+    "apistart": "node build/src/server.js",
     "deploy": "node ./build/contracts/deploy.js"
   },
   "devDependencies": {
