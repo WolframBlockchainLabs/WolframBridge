@@ -155,6 +155,8 @@ A client contract should push and pull to receive data from oracle contract.
 Here is a smartpy snippet for reference. [Smartpy][smartpy]
 
 ## Future Development
+We have developed a Tezos on-chain prototype, forked from Harbinger with additional features, and established it using our [CCDB]
+https://github.com/WolframBlockchainLabs/WolframPriceFeedInfrastructure for cross-chain pricing information. We are now focusing on enhancing the selection and usage experience of the data feed. This enhancement will involve integrating pricing information into a fork of Wolfram|Alpha and creating a unique user experience (UX).
 We'll be adding some new set of features to provide more customisation to Server Node, stay tuned!
 
 ## License
