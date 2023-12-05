@@ -8,7 +8,7 @@ A Wolfram bridge oracle server to provide off-chain data on tezos blockchain.
 
 ## Basic Terminology
 
-![Oracle Diagarm](image/Tezos_Oracle_System_v6.png)
+![Oracle Diagarm](image/Tezos_Oracle_System_v7.png)
 
 ### Oracle Server
 It is used to feed off-chain data in your oracle contract(s). 
