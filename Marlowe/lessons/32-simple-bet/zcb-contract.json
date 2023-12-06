@@ -1,0 +1,79 @@
+{
+    "timeout": 1694636583000,
+    "timeout_continuation": "close",
+    "when": [
+        {
+            "case": {
+                "deposits": 80000000,
+                "into_account": {
+                    "address": "addr_test1vpt306v4wp7m6xn46hje64d6yuraxsruna03as4qgakm5cc222sc0"
+                },
+                "of_token": {
+                    "currency_symbol": "",
+                    "token_name": ""
+                },
+                "party": {
+                    "address": "addr_test1vpt306v4wp7m6xn46hje64d6yuraxsruna03as4qgakm5cc222sc0"
+                }
+            },
+            "then": {
+                "from_account": {
+                    "address": "addr_test1vpt306v4wp7m6xn46hje64d6yuraxsruna03as4qgakm5cc222sc0"
+                },
+                "pay": 80000000,
+                "then": {
+                    "timeout": 1694643783000,
+                    "timeout_continuation": "close",
+                    "when": [
+                        {
+                            "case": {
+                                "deposits": {
+                                    "add": 80000000,
+                                    "and": 5000000
+                                },
+                                "into_account": {
+                                    "address": "addr_test1vpyxad0mhrxgme9yz2yntdcnxknr6w6zrf70etua6przugcfsmd48"
+                                },
+                                "of_token": {
+                                    "currency_symbol": "",
+                                    "token_name": ""
+                                },
+                                "party": {
+                                    "address": "addr_test1vpyxad0mhrxgme9yz2yntdcnxknr6w6zrf70etua6przugcfsmd48"
+                                }
+                            },
+                            "then": {
+                                "from_account": {
+                                    "address": "addr_test1vpyxad0mhrxgme9yz2yntdcnxknr6w6zrf70etua6przugcfsmd48"
+                                },
+                                "pay": {
+                                    "add": 80000000,
+                                    "and": 5000000
+                                },
+                                "then": "close",
+                                "to": {
+                                    "party": {
+                                        "address": "addr_test1vpt306v4wp7m6xn46hje64d6yuraxsruna03as4qgakm5cc222sc0"
+                                    }
+                                },
+                                "token": {
+                                    "currency_symbol": "",
+                                    "token_name": ""
+                                }
+                            }
+                        }
+                    ]
+                },
+                "to": {
+                    "party": {
+                        "address": "addr_test1vpyxad0mhrxgme9yz2yntdcnxknr6w6zrf70etua6przugcfsmd48"
+                    }
+                },
+                "token": {
+                    "currency_symbol": "",
+                    "token_name": ""
+                }
+            }
+        }
+    ]
+}
