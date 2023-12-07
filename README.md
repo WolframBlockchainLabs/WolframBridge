@@ -1,6 +1,6 @@
 #Wolfram Bridge
 
-This repository contains examples of smart contracts that leverage the bridge real-world data as input for desentralized applications. This bridge plays a crucial role in bringing external data onto the blockchain, enabling applications to interact with off-chain information.
+This repository contains examples of smart contracts that leverage the bridge of real-world data as input for desentralized applications. This bridge plays a crucial role enabling applications to interact with off-chain information.
 
 ## Table of Contents
 
@@ -14,8 +14,9 @@ Smart contracts often require external data to perform certain functions or make
 
 ## Examples
 
-### 1. Simple Choice
+### 1. Marlowe
 
-### 2. European Covered Call Option
+### 2. Tezos
 
-## Getting Started
+### 3. Stellar
+
