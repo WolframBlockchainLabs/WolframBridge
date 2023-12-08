@@ -22,13 +22,14 @@ Our prototype directly inputs values into the smart contract by the Bridge addre
 
 ## Getting Started
 Here are the steps to run our prototypes:
-# 1. To make sure we are always up to date with the Marlowe versions clone [Marlowe Starter Kit](https://github.com/input-output-hk/marlowe-starter-kit).
-# 2. In an other folder copy the contents of the Marlowe directory
+1. To make sure we are always up to date with the Marlowe versions clone [Marlowe Starter Kit](https://github.com/input-output-hk/marlowe-starter-kit).
+2. In an other folder copy the contents of the Marlowe directory
 ```
 git clone --depth 1 --no-checkout https://github.com/WolframBlockchainLabs/WolframBridge
 cd WolframBridge
 git sparse-checkout set Marlowe
 git checkout
 ```
-# 3. Copy the contents of the lessons folder and copy it on the starter-kit lessons folder
+3. Copy the contents of the lessons folder and copy it on the starter-kit lessons folder
+4. Follow the instructions either for [Docker](https://github.com/input-output-hk/marlowe-starter-kit/blob/main/docs/docker.md) or [demeter.run](https://github.com/input-output-hk/marlowe-starter-kit/blob/main/docs/demeter-run.md)
 
