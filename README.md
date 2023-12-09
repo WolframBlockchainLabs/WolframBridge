@@ -12,11 +12,12 @@ This repository contains examples of smart contracts that leverage the bridge of
 
 Smart contracts often require external data to perform certain functions or make decisions. Our service will act as a bridge between smart contracts and the external world, providing reliable data from off-chain sources. This repository aims to showcase prototypes built for different blockchains that use external data to execute.
 
-## Examples
+## Prototype Examples
 
 ### 1. Marlowe
 
 ### 2. Tezos
 
-### 3. Stellar
+### 3. Stellar 
+Importantly, this is just a fork of an existing 'oracle.' We have only worked on a European Call example here, without modifying the original oracle.
 
